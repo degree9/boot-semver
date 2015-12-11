@@ -8,11 +8,11 @@
             [clj-semver.core    :as ver]
             [clojurewerkz.propertied.properties :as prop]))
 
-(defn snapshot [x] "SNAPSHOT")
-
 (defn alpha [x] "alpha")
 
 (defn beta [x] "beta")
+
+(defn snapshot [x] "SNAPSHOT")
 
 (def semver-file "./version.properties")
 
@@ -31,28 +31,26 @@
     (prop/store-to {"VERSION" version} (io/file file))))
 
 (defn to-mavver [{:keys [major minor patch pre-release build]}]
-  (clojure.string/join
-   (cond-> []
-           major (into [major])
-           minor (into ["." minor])
-           patch (into ["." patch])
-           pre-release (into ["-" pre-release])
-           build (into ["-" build]))))
+  (clojure.string/join (cond-> []
+                               major (into [major])
+                               minor (into ["." minor])
+                               patch (into ["." patch])
+                               pre-release (into ["-" pre-release])
+                               build (into ["-" build]))))
 
 (boot/deftask version
-  ""
+  "Semantic Versioning for your project."
   [x major       MAJ  sym "Symbol of fn to apply to Major version."
    y minor       MIN  sym "Symbol of fn to apply to Minor version."
    z patch       PAT  sym "Symbol of fn to apply to Patch version."
    r pre-release PRE  sym "Symbol of fn to apply to Pre-Release version."
    b build       BLD  sym "Symbol of fn to apply to Build version."]
-  (let [curver (get-semver semver-file)
+  (let [curver  (get-semver semver-file)
         version (to-mavver (update-version (ver/version curver) *opts*))]
     (boot/task-options! task/pom #(assoc-in % [:version] version))
     (boot/with-pre-wrap [fs]
       (util/info (clojure.string/join ["Current Project Version...: " curver "\n"]))
       (when (not= curver version)
-        (let []
-          (util/info (clojure.string/join ["Updating Project Version...: " curver "->" version "\n"]))
+        (let [] (util/info (clojure.string/join ["Updating Project Version...: " curver "->" version "\n"]))
           (set-semver semver-file version)))
       fs)))

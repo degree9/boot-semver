@@ -11,8 +11,7 @@
  '[adzerk.bootlaces :refer :all]
  '[boot-semver.core :refer :all])
 
-
-(auto-version! {:minor inc})
+(auto-version!)
 
 (task-options!
  pom {:project 'degree9/boot-semver
@@ -21,9 +20,17 @@
       :scm {:url ""}})
 
 (deftask dev
-  "Build boot-semver for development"
+  "Build boot-semver for development."
   []
   (comp
    (watch)
-   (version)
+   (version :patch inc)
    (build-jar)))
+
+(deftask prod
+  "Build boot-semver for deployment to clojars."
+  []
+  (comp
+   (version :patch inc)
+   (build-jar)
+   (push-release)))

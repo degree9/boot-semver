@@ -28,6 +28,6 @@
   "Build boot-semver for deployment to clojars."
   []
   (comp
-   (version)
+   (version :minor 'inc)
    (build-jar)
    (push-release)))

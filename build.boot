@@ -25,7 +25,7 @@
    (build-jar)))
 
 (deftask prod
-  "Build boot-semver for deployment to clojars."
+  "Build boot-semver and deploy to clojars."
   []
   (comp
    (version :minor 'inc)

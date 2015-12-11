@@ -24,13 +24,12 @@
   []
   (comp
    (watch)
-   (version :patch inc)
    (build-jar)))
 
 (deftask prod
   "Build boot-semver for deployment to clojars."
   []
   (comp
-   (version :patch inc)
+   (version :patch 'inc)
    (build-jar)
    (push-release)))

@@ -11,7 +11,7 @@
  '[adzerk.bootlaces :refer :all]
  '[boot-semver.core :refer :all])
 
-(auto-version! {:minor 'inc})
+;(auto-version! {:minor 'inc})
 
 (task-options!
  pom {:project 'degree9/boot-semver

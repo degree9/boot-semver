@@ -41,13 +41,12 @@
 
 (boot/deftask version
   ""
-  [f file        FILE str "Version target file."
-   x major       MAJ  sym "Symbol of fn to apply to Major version."
+  [x major       MAJ  sym "Symbol of fn to apply to Major version."
    y minor       MIN  sym "Symbol of fn to apply to Minor version."
    z patch       PAT  sym "Symbol of fn to apply to Patch version."
    r pre-release PRE  sym "Symbol of fn to apply to Pre-Release version."
    b build       BLD  sym "Symbol of fn to apply to Build version."]
-  (let [curver (get-semver (or (:file *opts*) semver-file))
+  (let [curver (get-semver semver-file)
         version (to-mavver (update-version (ver/version curver) *opts*))]
     (boot/task-options!
      task/pom #(assoc-in % [:version] version))

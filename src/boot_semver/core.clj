@@ -48,11 +48,11 @@
    b build       BLD  sym "Symbol of fn to apply to Build version."]
   (let [curver (get-semver semver-file)
         version (to-mavver (update-version (ver/version curver) *opts*))]
-    (boot/task-options!
-     task/pom #(assoc-in % [:version] version))
+    (boot/task-options! task/pom #(assoc-in % [:version] version))
     (boot/with-pre-wrap [fs]
-      (if (not= curver version)
-        (util/info (clojure.string/join ["Updating Project Version...: " curver "->" version "\n"]))
-        (util/info (clojure.string/join ["Setting Project Version...: " version "\n"])))
-      (set-semver semver-file version)
+      (util/info (clojure.string/join ["Current Project Version...: " curver "\n"]))
+      (when (not= curver version)
+        (let []
+          (util/info (clojure.string/join ["Updating Project Version...: " curver "->" version "\n"]))
+          (set-semver semver-file version)))
       fs)))

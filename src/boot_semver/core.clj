@@ -10,16 +10,12 @@
 
 (def semver-file "./version.properties")
 
-(defn- update-version [upmap [k v]]
-  (let [uv (k upmap)]
-    (cond (and (string? uv) (ver/valid-format? uv)) [k uv]
-          (integer? uv) [k (str uv)]
-          (fn? uv) [k (uv v)]
-          :else [k v])))
+(defn- update-version [vermap upmap]
+  (merge-with (fn [uv vv] ((resolve uv) vv)) upmap vermap))
 
 (defn get-semver
   ([] (get-semver semver-file))
-  ([file] (get-semver semver-file "0.1.0"))
+  ([file] (get-semver semver-file "0.0.0"))
   ([file version] (if (.exists (io/as-file file))
                     (or (:VERSION (prop/properties->map (prop/load-from (io/file file)) true)) version)
                     version)))
@@ -39,29 +35,36 @@
 (boot/deftask version
   ""
   [f file        FILE str "version.properties target file."
-   v ver         VER  str "New version to be set."
-   x major       MAJ  sym "Major version number (X = X.y.z)"
-   y minor       MIN  sym "Minor version number (Y = x.Y.z)"
-   z patch       PAT  sym "Patch version number (Z = x.y.Z)"
-   p pre-release PRE  sym "Major version number (P = x.y.z-P)"]
+   v ver         VER  str "Version to be updated."
+   x major       MAJ  sym "Symbol of fn to apply to Major."
+   y minor       MIN  sym "Symbol of fn to apply to Minor."
+   z patch       PAT  sym "Symbol of fn to apply to Patch."
+   p pre-release PRE  sym "Symbol of fn to apply to Pre-Release."]
   (boot/with-pre-wrap [fs]
-    (let [upmap (cond-> []
-                        (:major *opts*) (into [(:major *opts*)])
-                        (:minor *opts*) (into ["." (:minor *opts*)])
-                        (:patch *opts*) (into ["." (:patch *opts*)])
-                        (:pre-release *opts*) (into ["-" (:pre-release *opts*)]))
+    (let [upmap (cond-> {}
+                        (:major *opts*) (assoc-in [:major] (:major *opts*))
+                        (:minor *opts*) (assoc-in [:minor] (:minor *opts*))
+                        (:patch *opts*) (assoc-in [:patch] (:patch *opts*))
+                        (:pre-release *opts*) (assoc-in [:pre-release] (:pre-release *opts*)))
           oldver (:ver *opts*)
-          newver (to-mavver (into {} (map (partial update-version upmap) (ver/version oldver))))]
+          newver (to-mavver (update-version (ver/version oldver) upmap))]
       (if (not= oldver newver)
         (util/info (clojure.string/join ["Updating Project Version...: " oldver "->" newver "\n"]))
         (util/info (clojure.string/join ["Setting Project Version...: " newver "\n"])))
       (set-semver (io/file (:file *opts*)) newver))
     fs))
 
-(defn auto-version! [& [verfile]]
+(defn version! [version & [verfile]]
   (let [verfile (or verfile semver-file)
-        version (-> (get-semver verfile) ver/version to-mavver)]
+        version  (get-semver verfile)]
     (boot/task-options!
-     version #(assoc-in % [:ver] version)
-     version #(assoc-in % [:file] (.getPath (io/as-file verfile)))
+     version {:ver version :file verfile}
+     task/pom #(assoc-in % [:version] version))))
+
+(defn auto-version! [& [{:as upmap :or {}} [verfile]]]
+  (let [verfile (or verfile semver-file)
+        oldver  (get-semver verfile)
+        version (to-mavver (update-version (ver/version oldver) upmap))]
+    (boot/task-options!
+     version (merge upmap {:ver oldver :file verfile})
      task/pom #(assoc-in % [:version] version))))

@@ -40,10 +40,10 @@
   ""
   [f file        FILE str "version.properties target file."
    v ver         VER  str "New version to be set."
-   x major       MAJ  str "Major version number (X = X.y.z)"
-   y minor       MIN  str "Minor version number (Y = x.Y.z)"
-   z patch       PAT  str "Patch version number (Z = x.y.Z)"
-   p pre-release PRE  str "Major version number (P = x.y.z-P)"]
+   x major       MAJ  sym "Major version number (X = X.y.z)"
+   y minor       MIN  sym "Minor version number (Y = x.Y.z)"
+   z patch       PAT  sym "Patch version number (Z = x.y.Z)"
+   p pre-release PRE  sym "Major version number (P = x.y.z-P)"]
   (boot/with-pre-wrap [fs]
     (let [upmap (cond-> []
                         (:major *opts*) (into [(:major *opts*)])

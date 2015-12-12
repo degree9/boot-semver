@@ -26,7 +26,7 @@
                     (or (:VERSION (prop/properties->map (prop/load-from (io/file file)) true)) version)
                     version)))
 
-(defn set-version [file version]
+(defn set-version! [file version]
   (let [version (or version "0.1.0")]
     (prop/store-to {"VERSION" version} (io/file file))))
 

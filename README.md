@@ -2,7 +2,7 @@
 
 [](dependency)
 ```clojure
-[degree9/boot-semver "0.6.0"] ;; latest release
+[degree9/boot-semver "0.7.0"] ;; latest release
 ```
 [](/dependency)
 

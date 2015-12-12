@@ -19,14 +19,14 @@
 (defn- update-version [vermap upmap]
   (merge-with (fn [uv vv] ((resolve uv) vv)) upmap vermap))
 
-(defn get-semver
-  ([] (get-semver semver-file))
-  ([file] (get-semver semver-file "0.0.0"))
+(defn get-version
+  ([] (get-version semver-file))
+  ([file] (get-version semver-file "0.0.0"))
   ([file version] (if (.exists (io/as-file file))
                     (or (:VERSION (prop/properties->map (prop/load-from (io/file file)) true)) version)
                     version)))
 
-(defn set-semver [file version]
+(defn set-version [file version]
   (let [version (or version "0.1.0")]
     (prop/store-to {"VERSION" version} (io/file file))))
 
@@ -45,13 +45,13 @@
    z patch       PAT  sym "Symbol of fn to apply to Patch version."
    r pre-release PRE  sym "Symbol of fn to apply to Pre-Release version."
    b build       BLD  sym "Symbol of fn to apply to Build version."]
-  (let [curver  (get-semver semver-file)
+  (let [curver  (get-version semver-file)
         version (to-mavver (update-version (ver/version curver) *opts*))]
-    (boot/task-options! task/pom #(assoc-in % [:version] version)
+    (boot/task-options! task/pom  #(assoc-in % [:version] version)
                         task/push #(assoc-in % [:ensure-version] version))
     (boot/with-pre-wrap [fs]
       (util/info (clojure.string/join ["Current Project Version...: " curver "\n"]))
       (when (not= curver version)
         (let [] (util/info (clojure.string/join ["Updating Project Version...: " curver "->" version "\n"]))
-          (set-semver semver-file version)))
+          (set-version! semver-file version)))
       fs)))

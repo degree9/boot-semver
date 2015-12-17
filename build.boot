@@ -24,7 +24,7 @@
    (watch)
    (build-jar)))
 
-(deftask prod
+(deftask deploy
   "Build boot-semver and deploy to clojars."
   []
   (comp

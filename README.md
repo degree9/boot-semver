@@ -2,7 +2,7 @@
 
 [](dependency)
 ```clojure
-[degree9/boot-semver "0.6.0"] ;; latest release
+[degree9/boot-semver "0.7.0"] ;; latest release
 ```
 [](/dependency)
 
@@ -12,8 +12,8 @@ Semantic Versioning task for [boot-clj][1].
 * Parses a `version.properties` file to read the current project version.
 * Writes a new (if changed) [Maven compatible][2] version string to `version.properties`.
 
-> The following outlines basic usage of the task, extensive testing has not been
-> done. Please submit issues and pull requests!
+> The following outlines basic usage of the task, extensive testing has not been done.
+> Please submit issues and pull requests!
 
 ## Usage
 
@@ -28,6 +28,18 @@ Then use the `version` task when pushing to clojars:
 
 ```bash
 boot version -y inc build-jar push-release
+```
+
+Or use the `version` task in a deployment process:
+
+```clojure
+(deftask deploy
+  "Build boot-semver and deploy to clojars."
+  []
+  (comp
+   (version :minor 'inc)
+   (build-jar)
+   (push-release)))
 ```
 
 [1]: https://github.com/boot-clj/boot

@@ -30,5 +30,17 @@ Then use the `version` task when pushing to clojars:
 boot version -y inc build-jar push-release
 ```
 
+Or use the `version` task in a deployment process:
+
+```clojure
+(deftask deploy
+  "Build boot-semver and deploy to clojars."
+  []
+  (comp
+   (version :minor 'inc)
+   (build-jar)
+   (push-release)))
+```
+
 [1]: https://github.com/boot-clj/boot
 [2]: https://docs.oracle.com/middleware/1212/core/MAVEN/maven_version.htm

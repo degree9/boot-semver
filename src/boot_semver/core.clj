@@ -19,6 +19,26 @@
 
 (defn snapshot [x] "SNAPSHOT")
 
+(defn zero  [x] "0")
+
+(defn one   [x] "1")
+
+(defn two   [x] "2")
+
+(defn three [x] "3")
+
+(defn four  [x] "4")
+
+(defn five  [x] "5")
+
+(defn six   [x] "6")
+
+(defn seven [x] "7")
+
+(defn eight [x] "8")
+
+(defn nine  [x] "9")
+
 ;;TODO add pre-release inc/dec functions
 
 (defn semver-date [x] (timef/unparse (timef/formatter "yyyyMMdd") (timec/now)))

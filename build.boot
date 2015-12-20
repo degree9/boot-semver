@@ -25,6 +25,7 @@
    (watch)
    (version :no-update true
             :minor 'inc
+            :patch 'zero
             :pre-release 'snapshot)
    (build-jar)))
 
@@ -32,6 +33,7 @@
   "Build boot-semver and deploy to clojars."
   []
   (comp
-   (version :minor 'inc)
+   (version :minor 'inc
+            :patch 'zero)
    (build-jar)
    (push-release)))

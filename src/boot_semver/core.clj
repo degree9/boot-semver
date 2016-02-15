@@ -13,39 +13,39 @@
 
 (def semver-file "./version.properties")
 
-(defn alpha [x] "alpha")
+(defn alpha [& _] "alpha")
 
-(defn beta [x] "beta")
+(defn beta [& _] "beta")
 
-(defn snapshot [x] "SNAPSHOT")
+(defn snapshot [& _] "SNAPSHOT")
 
-(defn zero  [x] "0")
+(defn zero  [& _] "0")
 
-(defn one   [x] "1")
+(defn one   [& _] "1")
 
-(defn two   [x] "2")
+(defn two   [& _] "2")
 
-(defn three [x] "3")
+(defn three [& _] "3")
 
-(defn four  [x] "4")
+(defn four  [& _] "4")
 
-(defn five  [x] "5")
+(defn five  [& _] "5")
 
-(defn six   [x] "6")
+(defn six   [& _] "6")
 
-(defn seven [x] "7")
+(defn seven [& _] "7")
 
-(defn eight [x] "8")
+(defn eight [& _] "8")
 
-(defn nine  [x] "9")
+(defn nine  [& _] "9")
 
 ;;TODO add pre-release inc/dec functions
 
-(defn semver-date [x] (timef/unparse (timef/formatter "yyyyMMdd") (timec/now)))
+(defn semver-date [& _] (timef/unparse (timef/formatter "yyyyMMdd") (timec/now)))
 
-(defn semver-time [x] (timef/unparse (timef/formatter "hhmmss") (timec/now)))
+(defn semver-time [& _] (timef/unparse (timef/formatter "hhmmss") (timec/now)))
 
-(defn semver-date-time [x & [delim]] (clojure.string/join [(semver-date) (or delim "-") (semver-time)]))
+(defn semver-date-time [& [_ delim]] (clojure.string/join [(semver-date) (or delim "-") (semver-time)]))
 
 (defn semver-date-dot-time [x] (semver-date-time x "."))
 

@@ -50,7 +50,10 @@
 (defn semver-date-dot-time [& _] (semver-date-time nil "."))
 
 (defn- update-version [vermap upmap]
-  (merge-with (fn [uv vv] ((resolve uv) (or vv 0))) upmap vermap))
+  (let [res #(-> % symbol resolve)]
+    (merge-with (fn [uv vv] (if (res uv)
+                              ((res uv) (or vv 0))
+                              (util/exit-error (util/fail "Unable to resolve symbol: %s \n" uv)))) upmap vermap)))
 
 (defn get-version
   ([] (get-version semver-file))

@@ -47,10 +47,10 @@
 
 (defn semver-date-time [& [_ delim]] (clojure.string/join [(semver-date) (or delim "-") (semver-time)]))
 
-(defn semver-date-dot-time [x] (semver-date-time x "."))
+(defn semver-date-dot-time [& _] (semver-date-time nil "."))
 
 (defn- update-version [vermap upmap]
-  (merge-with (fn [uv vv] ((resolve uv) vv)) upmap vermap))
+  (merge-with (fn [uv vv] ((resolve uv) (or vv 0))) upmap vermap))
 
 (defn get-version
   ([] (get-version semver-file))

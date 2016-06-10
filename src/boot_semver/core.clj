@@ -2,13 +2,10 @@
   (:require [boot.core          :as boot]
             [boot.task.built-in :as task]
             [boot.util          :as util]
-            [hoplon.boot-hoplon :as hoplon]
-            [adzerk.bootlaces   :as bootlaces]
             [clojure.java.io    :as io]
             [clj-semver.core    :as ver]
             [clojurewerkz.propertied.properties :as prop]
             [clj-time.core      :as timec]
-            [clj-time.coerce    :as timeco]
             [clj-time.format    :as timef]))
 
 (def semver-file "./version.properties")

@@ -2,6 +2,7 @@
   (:require [boot.core          :as boot]
             [boot.task.built-in :as task]
             [boot.util          :as util]
+            [boot.git           :as git]
             [clojure.java.io    :as io]
             [clj-semver.core    :as ver]
             [clojurewerkz.propertied.properties :as prop]
@@ -51,6 +52,12 @@
     (merge-with (fn [uv vv] (if (res uv)
                               ((res uv) (or vv 0))
                               (util/exit-error (util/fail "Unable to resolve symbol: %s \n" uv)))) upmap vermap)))
+
+(defn semver-git [& _]
+  (str (git/last-commit)))
+
+(defn semver-short-git [& _]
+  (subs (semver-git) 0 5))
 
 (defn get-version
   ([] (get-version semver-file))

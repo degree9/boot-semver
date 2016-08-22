@@ -1,10 +1,7 @@
 # boot-semver
 
-[](dependency)
-```clojure
-[degree9/boot-semver "1.3.1"] ;; latest release
-```
-[](/dependency)
+[![Clojars Project](https://img.shields.io/clojars/v/degree9/boot-semver.svg)](https://clojars.org/degree9/boot-semver)
+
 
 Semantic Versioning task for [boot-clj][1].
 

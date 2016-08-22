@@ -78,7 +78,10 @@
    z patch       PAT  sym  "Symbol of fn to apply to Patch version."
    r pre-release PRE  sym  "Symbol of fn to apply to Pre-Release version."
    b build       BLD  sym  "Symbol of fn to apply to Build version."
-   n no-update        bool "Prevents writing to version.properties file."]
+   n no-update        bool "Prevents writing to version.properties file."
+   i include          bool "Includes version.properties file in out-files."
+   ;g generate   GEN  sym  "Generate a namespace with version information."
+   ]
   (let [curver  (get-version semver-file)
         cursemver (ver/version curver)
         version (to-mavver (update-version (ver/version curver) *opts*))]
@@ -90,4 +93,9 @@
       (when (and (nil? (:no-update *opts*)) (not= curver version))
         (util/info (clojure.string/join ["Updating Project Version...: " curver "->" version "\n"]))
         (set-version! semver-file version))
-      fs)))
+      (if (:include *opts*)
+        (-> fs (boot/add-resource
+                 (-> semver-file io/file .getParent io/file)
+                 :include #{#"version.properties"})
+               boot/commit!)
+        fs))))

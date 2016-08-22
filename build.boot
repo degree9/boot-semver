@@ -1,5 +1,6 @@
 (set-env!
  :dependencies  '[[org.clojure/clojure     "1.7.0"]
+                  [boot/core               "2.6.0"]
                   [adzerk/bootlaces        "0.1.13" :scope "test"]
                   [clojurewerkz/propertied "1.2.0"]
                   [grimradical/clj-semver  "0.3.0"]
@@ -12,11 +13,13 @@
 
 (task-options!
  pom {:project 'degree9/boot-semver
-      :description ""
-      :url         ""
-      :scm {:url ""}})
+      :version (get-version)
+      :description "Semantic versioning for boot projects."
+      :url         "https://github.com/degree9/boot-semver"
+      :scm {:url "https://github.com/degree9/boot-semver"}}
+ target {:dir #{"target"}})
 
-(deftask dev
+(deftask develop
   "Build boot-semver for development."
   []
   (comp
@@ -25,13 +28,14 @@
             :minor 'inc
             :patch 'zero
             :pre-release 'snapshot)
+   (target)
    (build-jar)))
 
 (deftask deploy
   "Build boot-semver and deploy to clojars."
   []
   (comp
-   (version :minor 'inc
-            :patch 'zero)
+   (version)
+   (target)
    (build-jar)
    (push-release)))

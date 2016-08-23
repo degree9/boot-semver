@@ -10,7 +10,7 @@
 
 (require
  '[adzerk.bootlaces :refer :all]
- '[boot-semver.core :refer :all])
+ '[degree9.boot-semver :refer :all])
 
 (task-options!
  pom {:project 'degree9/boot-semver
@@ -29,7 +29,7 @@
             :minor 'inc
             :patch 'zero
             :pre-release 'snapshot
-            :generate 'degree9.semver)
+            :generate 'degree9.boot-semver.version)
    (target)
    (build-jar)))
 

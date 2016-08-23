@@ -47,13 +47,18 @@
 
 (defn semver-date-dot-time [& _] (semver-date-time nil "."))
 
+(defn- str->num [str]
+  (let [n (read-string str)]
+    (if (number? n)
+      n str)))
+
 (defn- update-version [vermap upmap]
   (let [res #(-> % symbol resolve)]
     (merge-with
       (fn [uv vv]
         (if (res uv)
           ((res uv) (if (string? vv)
-                      (-> vv (clojure.string/replace #"[-+]" ""))
+                      (-> vv (clojure.string/replace #"[-+]" "") str->num)
                       (or vv 0)))
           (util/exit-error (util/fail "Unable to resolve symbol: %s \n" uv)))) upmap vermap)))
 

@@ -53,7 +53,7 @@
       (fn [uv vv]
         (if (res uv)
           ((res uv) (if (string? vv)
-                      (-> vv (clojure.string/replace #"[-+]" "") read-string)
+                      (-> vv (clojure.string/replace #"[-+]" ""))
                       (or vv 0)))
           (util/exit-error (util/fail "Unable to resolve symbol: %s \n" uv)))) upmap vermap)))
 

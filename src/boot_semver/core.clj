@@ -47,9 +47,8 @@
 (defn semver-date-dot-time [& _] (semver-date-time nil "."))
 
 (defn- str->num [str]
-  (let [n (read-string str)]
-    (if (number? n)
-      n str)))
+  (if (re-matches #"\d" str)
+    (bigdec n) str))
 
 (defn- update-version [vermap upmap]
   (let [res #(-> % symbol resolve)]

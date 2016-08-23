@@ -4,7 +4,8 @@
                   [adzerk/bootlaces        "0.1.13" :scope "test"]
                   [clojurewerkz/propertied "1.2.0"]
                   [grimradical/clj-semver  "0.3.0"]
-                  [clj-time                "0.11.0"]]
+                  [clj-time                "0.11.0"]
+                  [seancorfield/boot-new   "0.4.6"]]
  :resource-paths   #{"src"})
 
 (require
@@ -27,7 +28,8 @@
    (version :no-update true
             :minor 'inc
             :patch 'zero
-            :pre-release 'snapshot)
+            :pre-release 'snapshot
+            :generate 'degree9.semver)
    (target)
    (build-jar)))
 

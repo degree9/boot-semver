@@ -4,7 +4,8 @@
                   [adzerk/bootlaces        "0.1.13" :scope "test"]
                   [clojurewerkz/propertied "1.2.0"]
                   [grimradical/clj-semver  "0.3.0"]
-                  [clj-time "0.11.0"]]
+                  [clj-time                "0.11.0"]
+                  [funcool/cuerdas         "0.8.0"]]
  :resource-paths   #{"src"})
 
 (require

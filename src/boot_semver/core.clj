@@ -5,9 +5,7 @@
             [adzerk.bootlaces   :as bootlaces]
             [clojure.java.io    :as io]
             [clj-semver.core    :as ver]
-            [clojurewerkz.propertied.properties :as prop]
             [clj-time.core      :as timec]
-            [clj-time.coerce    :as timeco]
             [clj-time.format    :as timef]))
 
 (def semver-file "./version.properties")
@@ -50,9 +48,13 @@
 
 (defn- update-version [vermap upmap]
   (let [res #(-> % symbol resolve)]
-    (merge-with (fn [uv vv] (if (res uv)
-                              ((res uv) (or vv 0))
-                              (util/exit-error (util/fail "Unable to resolve symbol: %s \n" uv)))) upmap vermap)))
+    (merge-with
+      (fn [uv vv]
+        (if (res uv)
+          ((res uv) (if (string? vv)
+                      (-> vv (cstr/strip-prefix "+") (cstr/strip-prefix "-") read-string)
+                      (or vv 0)))
+          (util/exit-error (util/fail "Unable to resolve symbol: %s \n" uv)))) upmap vermap)))
 
 (defn get-version
   ([] (get-version semver-file))

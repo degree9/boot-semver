@@ -49,7 +49,7 @@
 
 (defn- str->num [str]
   (if (re-matches #"\d" str)
-    (bigdec n) str))
+    (bigdec str) str))
 
 (defn- update-version [vermap upmap]
   (let [res #(-> % symbol resolve)]

@@ -7,7 +7,8 @@
             [clj-semver.core    :as ver]
             [clojurewerkz.propertied.properties :as prop]
             [clj-time.core      :as timec]
-            [clj-time.format    :as timef]))
+            [clj-time.format    :as timef]
+            [cuerdas.core       :as cstr]))
 
 (def semver-file "./version.properties")
 
@@ -49,9 +50,13 @@
 
 (defn- update-version [vermap upmap]
   (let [res #(-> % symbol resolve)]
-    (merge-with (fn [uv vv] (if (res uv)
-                              ((res uv) (or vv 0))
-                              (util/exit-error (util/fail "Unable to resolve symbol: %s \n" uv)))) upmap vermap)))
+    (merge-with
+      (fn [uv vv]
+        (if (res uv)
+          ((res uv) (if (string? vv)
+                      (-> vv (cstr/strip-prefix "+") (cstr/strip-prefix "-") read-string)
+                      (or vv 0)))
+          (util/exit-error (util/fail "Unable to resolve symbol: %s \n" uv)))) upmap vermap)))
 
 (defn semver-git [& _]
   (str (git/last-commit)))

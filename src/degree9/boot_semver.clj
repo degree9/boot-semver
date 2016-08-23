@@ -115,4 +115,4 @@
                    :include #{#"version.properties"})
                  boot/commit!)
           fs))
-      gen-ns (comp (new/new :generate [(str "semver=" gen-ns)] :force true)))))
+      gen-ns (comp (new/new :generate [(str "semver=" gen-ns "/VERSION" )] :args [(str (get-version))])))))

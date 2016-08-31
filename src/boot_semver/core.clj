@@ -5,7 +5,6 @@
             [boot.git           :as git]
             [clojure.java.io    :as io]
             [clj-semver.core    :as ver]
-            [clojurewerkz.propertied.properties :as prop]
             [clj-time.core      :as timec]
             [clj-time.format    :as timef]))
 
@@ -71,12 +70,17 @@
   ([] (get-version semver-file))
   ([file] (get-version semver-file "0.0.0"))
   ([file version] (if (.exists (io/as-file file))
-                    (or (:VERSION (prop/properties->map (prop/load-from (io/file file)) true)) version)
+                    (get (doto (java.util.Properties.)
+                           (.load ^java.io.Reader (io/reader file)))
+                         "VERSION"
+                         version)
                     version)))
 
 (defn set-version! [file version]
   (let [version (or version "0.1.0")]
-    (prop/store-to {"VERSION" version} (io/file file))))
+    (doto (java.util.Properties.)
+      (.setProperty "VERSION" version)
+      (.store ^java.io.Writer (io/writer file) nil))))
 
 (defn to-mavver [{:keys [major minor patch pre-release build]}]
   (clojure.string/join (cond-> []

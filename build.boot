@@ -1,8 +1,5 @@
 (set-env!
- :dependencies  '[[org.clojure/clojure     "1.7.0"]
-                  [boot/core               "2.6.0"]
-                  [adzerk/bootlaces        "0.1.13" :scope "test"]
-                  [clojurewerkz/propertied "1.2.0"]
+ :dependencies  '[[adzerk/bootlaces        "0.1.13" :scope "test"]
                   [grimradical/clj-semver  "0.3.0"]
                   [clj-time                "0.11.0"]]
  :resource-paths   #{"src"})

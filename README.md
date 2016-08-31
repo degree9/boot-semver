@@ -80,6 +80,9 @@ The `:no-update` option is provided for development tasks. These tasks will modi
 A few helper functions are provided to be used with the version task.
 
 ```clojure
+;; Generic
+'zero 'one 'two ... 'nine
+
 ;; Pre-Release version helpers
 'alpha    ;; "alpha"
 'beta     ;; "beta"
@@ -90,6 +93,8 @@ A few helper functions are provided to be used with the version task.
 'semver-time          ;; "hhmmss"
 'semver-date-time     ;; "yyyyMMdd-hhmmss"
 'semver-date-dot-time ;; "yyyyMMdd.hhmmss"
+'semver-git           ;; full git commit string
+'semver-short-git     ;; short git commit string (7 chars)
 ```
 
 [1]: https://github.com/boot-clj/boot

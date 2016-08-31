@@ -65,7 +65,7 @@
   (str (git/last-commit)))
 
 (defn semver-short-git [& _]
-  (subs (semver-git) 0 5))
+  (subs (semver-git) 0 7))
 
 (defn get-version
   ([] (get-version semver-file))
@@ -87,7 +87,29 @@
                                build (into ["+" build]))))
 
 (boot/deftask version
-  "Semantic Versioning for your project."
+  "Semantic Versioning for your project.
+
+  You can also :refer or :use the following helper symbols in your build.boot:
+
+  ;; Generic
+  'zero 'one 'two ... 'nine
+
+  ;; Pre-Release version helpers
+  'alpha 'beta 'snapshot
+
+  ;; Build version helpers
+  'semver-date          ;; \"yyyyMMdd\"
+  'semver-time          ;; \"hhmmss\"
+  'semver-date-time     ;; \"yyyyMMdd-hhmmss\"
+  'semver-date-dot-time ;; \"yyyyMMdd.hhmmss\"
+  'semver-git           ;; full git commit string
+  'semver-short-git     ;; short git commit string (7 chars)
+
+  And then use them at the command line:
+
+  boot version -r semver-short-git
+  Version in version.properties ...: 0.1.3
+  Current Build Version ...: 0.1.3-1d7cfab"
   [x major       MAJ  sym  "Symbol of fn to apply to Major version."
    y minor       MIN  sym  "Symbol of fn to apply to Minor version."
    z patch       PAT  sym  "Symbol of fn to apply to Patch version."

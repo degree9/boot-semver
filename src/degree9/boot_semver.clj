@@ -6,7 +6,6 @@
             [boot.new           :as new]
             [clojure.java.io    :as io]
             [clj-semver.core    :as ver]
-            [clojurewerkz.propertied.properties :as prop]
             [clj-time.core      :as timec]
             [clj-time.format    :as timef]))
 
@@ -72,12 +71,17 @@
   ([] (get-version semver-file))
   ([file] (get-version semver-file "0.0.0"))
   ([file version] (if (.exists (io/as-file file))
-                    (or (:VERSION (prop/properties->map (prop/load-from (io/file file)) true)) version)
+                    (get (doto (java.util.Properties.)
+                           (.load ^java.io.Reader (io/reader file)))
+                         "VERSION"
+                         version)
                     version)))
 
 (defn set-version! [file version]
   (let [version (or version "0.1.0")]
-    (prop/store-to {"VERSION" version} (io/file file))))
+    (doto (java.util.Properties.)
+      (.setProperty "VERSION" version)
+      (.store ^java.io.Writer (io/writer file) nil))))
 
 (defn to-mavver [{:keys [major minor patch pre-release build]}]
   (clojure.string/join (cond-> []
@@ -88,7 +92,29 @@
                                build (into ["+" build]))))
 
 (boot/deftask version
-  "Semantic Versioning for your project."
+  "Semantic Versioning for your project.
+
+  You can also :refer or :use the following helper symbols in your build.boot:
+
+  ;; Generic
+  'zero 'one 'two ... 'nine
+
+  ;; Pre-Release version helpers
+  'alpha 'beta 'snapshot
+
+  ;; Build version helpers
+  'semver-date          ;; \"yyyyMMdd\"
+  'semver-time          ;; \"hhmmss\"
+  'semver-date-time     ;; \"yyyyMMdd-hhmmss\"
+  'semver-date-dot-time ;; \"yyyyMMdd.hhmmss\"
+  'semver-git           ;; full git commit string
+  'semver-short-git     ;; short git commit string (7 chars)
+
+  And then use them at the command line:
+
+  boot version -r semver-short-git
+  Version in version.properties ...: 0.1.3
+  Current Build Version ...: 0.1.3-1d7cfab"
   [x major       MAJ  sym  "Symbol of fn to apply to Major version."
    y minor       MIN  sym  "Symbol of fn to apply to Minor version."
    z patch       PAT  sym  "Symbol of fn to apply to Patch version."

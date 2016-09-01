@@ -56,11 +56,11 @@
                       (or vv 0)))
           (util/exit-error (util/fail "Unable to resolve symbol: %s \n" uv)))) upmap vermap)))
 
-(defn semver-git [& _]
+(defn git-sha1-full [& _]
   (str (git/last-commit)))
 
-(defn semver-short-git [& _]
-  (subs (semver-git) 0 7))
+(defn git-sha1 [& _]
+  (subs (semver-sha1-full) 0 7))
 
 (defn get-version
   ([] (get-version semver-file))
@@ -111,4 +111,5 @@
                    :include #{#"version.properties"})
                  boot/commit!)
           fs))
+              ;; this (comp) is probably not needed if fileset is passed to another task
       gen-ns (comp (new/new :generate [(str "semver=" gen-ns "/VERSION" )] :args [(str (get-version))])))))

@@ -1,12 +1,13 @@
 (set-env!
  :dependencies  '[[adzerk/bootlaces        "0.1.13" :scope "test"]
                   [grimradical/clj-semver  "0.3.0"]
-                  [clj-time                "0.11.0"]]
+                  [clj-time                "0.11.0"]
+                  [seancorfield/boot-new   "0.4.6"]]
  :resource-paths   #{"src"})
 
 (require
  '[adzerk.bootlaces :refer :all]
- '[boot-semver.core :refer :all])
+ '[degree9.boot-semver :refer :all])
 
 (task-options!
  pom {:project 'degree9/boot-semver
@@ -24,7 +25,8 @@
    (version :no-update true
             :minor 'inc
             :patch 'zero
-            :pre-release 'snapshot)
+            :pre-release 'snapshot
+            :generate 'degree9.boot-semver.version)
    (target)
    (build-jar)))
 

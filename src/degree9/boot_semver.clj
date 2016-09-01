@@ -1,8 +1,9 @@
-(ns boot-semver.core
+(ns degree9.boot-semver
   (:require [boot.core          :as boot]
             [boot.task.built-in :as task]
             [boot.util          :as util]
             [boot.git           :as git]
+            [boot.new           :as new]
             [clojure.java.io    :as io]
             [clj-semver.core    :as ver]
             [clj-time.core      :as timec]
@@ -36,15 +37,11 @@
 
 (defn nine  [& _] "9")
 
-;;TODO add pre-release inc/dec functions
-
 (defn semver-date [& _] (timef/unparse (timef/formatter "yyyyMMdd") (timec/now)))
 
 (defn semver-time [& _] (timef/unparse (timef/formatter "hhmmss") (timec/now)))
 
-(defn semver-date-time [& [_ delim]] (clojure.string/join [(semver-date) (or delim "-") (semver-time)]))
-
-(defn semver-date-dot-time [& _] (semver-date-time nil "."))
+(defn semver-date-time [& [_ delim]] (clojure.string/join [(semver-date) (or delim ".") (semver-time)]))
 
 (defn- str->num [str]
   (if (re-matches #"\d" str)
@@ -121,22 +118,25 @@
    b build       BLD  sym  "Symbol of fn to apply to Build version."
    n no-update        bool "Prevents writing to version.properties file."
    i include          bool "Includes version.properties file in out-files."
-   ;g generate   GEN  sym  "Generate a namespace with version information."
+   g generate    GEN  sym  "Generate a namespace with version information."
    ]
   (let [curver  (get-version semver-file)
         cursemver (ver/version curver)
-        version (to-mavver (update-version (ver/version curver) *opts*))]
+        version (to-mavver (update-version (ver/version curver) *opts*))
+        gen-ns (:generate *opts*)]
     (boot/task-options! task/pom  #(assoc-in % [:version] version)
                         task/push #(assoc-in % [:ensure-version] version))
-    (boot/with-pre-wrap [fs]
-      (util/info (clojure.string/join ["Version in version.properties ...: " curver "\n"]))
-      (util/info (clojure.string/join ["Current Build Version ...: " version "\n"]))
-      (when (and (nil? (:no-update *opts*)) (not= curver version))
-        (util/info (clojure.string/join ["Updating Project Version...: " curver "->" version "\n"]))
-        (set-version! semver-file version))
-      (if (:include *opts*)
-        (-> fs (boot/add-resource
-                 (-> semver-file io/file .getParent io/file)
-                 :include #{#"version.properties"})
-               boot/commit!)
-        fs))))
+    (cond->
+      (boot/with-pre-wrap fs
+        (util/info (clojure.string/join ["Version in version.properties ...: " curver "\n"]))
+        (util/info (clojure.string/join ["Current Build Version ...: " version "\n"]))
+        (when (and (nil? (:no-update *opts*)) (not= curver version))
+          (util/info (clojure.string/join ["Updating Project Version...: " curver "->" version "\n"]))
+          (set-version! semver-file version))
+        (if (:include *opts*)
+          (-> fs (boot/add-resource
+                   (-> semver-file io/file .getParent io/file)
+                   :include #{#"version.properties"})
+                 boot/commit!)
+          fs))
+      gen-ns (comp (new/new :generate [(str "semver=" gen-ns "/VERSION" )] :args [(str (get-version))])))))

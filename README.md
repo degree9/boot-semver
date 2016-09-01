@@ -19,7 +19,7 @@ Add `boot-semver` to your `build.boot` dependencies and `require` the namespace:
 
 ```clj
 (set-env! :dependencies '[[degree9/boot-semver "X.Y.Z" :scope "test"]])
-(require '[boot-semver.core :refer :all])
+(require '[degree9.boot-semver :refer :all])
 ```
 
 Get the current project version:

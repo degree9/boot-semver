@@ -36,15 +36,11 @@
 
 (defn nine  [& _] "9")
 
-;;TODO add pre-release inc/dec functions
-
 (defn semver-date [& _] (timef/unparse (timef/formatter "yyyyMMdd") (timec/now)))
 
 (defn semver-time [& _] (timef/unparse (timef/formatter "hhmmss") (timec/now)))
 
-(defn semver-date-time [& [_ delim]] (clojure.string/join [(semver-date) (or delim "-") (semver-time)]))
-
-(defn semver-date-dot-time [& _] (semver-date-time nil "."))
+(defn semver-date-time [& [_ delim]] (clojure.string/join [(semver-date) (or delim ".") (semver-time)]))
 
 (defn- str->num [str]
   (if (re-matches #"\d" str)

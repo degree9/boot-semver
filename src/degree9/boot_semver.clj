@@ -57,11 +57,11 @@
                       (or vv 0)))
           (util/exit-error (util/fail "Unable to resolve symbol: %s \n" uv)))) upmap vermap)))
 
-(defn semver-git [& _]
+(defn git-sha1-full [& _]
   (str (git/last-commit)))
 
-(defn semver-short-git [& _]
-  (subs (semver-git) 0 7))
+(defn git-sha1 [& _]
+  (subs (git-sha1-full) 0 7))
 
 (defn get-version
   ([] (get-version semver-file))
@@ -122,21 +122,29 @@
    ]
   (let [curver  (get-version semver-file)
         cursemver (ver/version curver)
-        version (to-mavver (update-version (ver/version curver) *opts*))
+        version-orig (to-mavver (update-version (ver/version curver) *opts*))
         gen-ns (:generate *opts*)]
-    (boot/task-options! task/pom  #(assoc-in % [:version] version)
-                        task/push #(assoc-in % [:ensure-version] version))
+        (boot/task-options! task/pom  #(assoc-in % [:version] version-orig)
+                            task/push #(assoc-in % [:ensure-version] version-orig))
+
     (cond->
       (boot/with-pre-wrap fs
-        (util/info (clojure.string/join ["Version in version.properties ...: " curver "\n"]))
-        (util/info (clojure.string/join ["Current Build Version ...: " version "\n"]))
-        (when (and (nil? (:no-update *opts*)) (not= curver version))
-          (util/info (clojure.string/join ["Updating Project Version...: " curver "->" version "\n"]))
-          (set-version! semver-file version))
-        (if (:include *opts*)
-          (-> fs (boot/add-resource
-                   (-> semver-file io/file .getParent io/file)
-                   :include #{#"version.properties"})
-                 boot/commit!)
-          fs))
+        ;; Rebuild Version incase it was modified by another task or by
+        ;; functions passed to the task which rely on a runtime value
+        ;; (pom and push will be out of sync)
+        (let [version (to-mavver (update-version (ver/version curver) *opts*))]
+          (when (not= version-orig version)
+            (util/warn (str "Version has been unexpectedly modified during task execution. \n")))
+          (util/info (clojure.string/join ["Version in version.properties ...: " curver "\n"]))
+          (util/info (clojure.string/join ["Current Build Version ...: " version "\n"]))
+          (when (and (nil? (:no-update *opts*)) (not= curver version))
+            (util/info (clojure.string/join ["Updating Project Version...: " curver "->" version "\n"]))
+            (set-version! semver-file version))
+          (if (:include *opts*)
+            (-> fs (boot/add-resource
+                    (-> semver-file io/file .getParent io/file)
+                    :include #{#"version.properties"})
+                  boot/commit!)
+            fs)))
+              ;; this (comp) is probably not needed if fileset is passed to another task
       gen-ns (comp (new/new :generate [(str "semver=" gen-ns "/VERSION" )] :args [(str (get-version))])))))

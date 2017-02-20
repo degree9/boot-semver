@@ -2,8 +2,8 @@
 [![Clojars Project](https://img.shields.io/clojars/v/degree9/boot-semver.svg)](https://clojars.org/degree9/boot-semver)
 [![Dependencies Status](https://jarkeeper.com/degree9/boot-semver/status.svg)](https://jarkeeper.com/degree9/boot-semver)
 [![Downloads](https://jarkeeper.com/degree9/boot-semver/downloads.svg)](https://jarkeeper.com/degree9/boot-semver)
-<!--- [![CircleCI](https://circleci.com/gh/degree9/boot-semver.svg?style=svg)](https://circleci.com/gh/degree9/boot-semver) --->
-[![gitcheese.com](https://api.gitcheese.com/v1/projects/83cde58b-907d-4cd9-ba61-405b78f7b8f4/badges?type=1&size=xs)](https://www.gitcheese.com/app/#/projects/83cde58b-907d-4cd9-ba61-405b78f7b8f4/pledges/create)
+<!--- [![CircleCI](https://circleci.com/gh/degree9/boot-semver.svg?style=svg)](https://circleci.com/gh/degree9/boot-semver)
+[![gitcheese.com](https://api.gitcheese.com/v1/projects/83cde58b-907d-4cd9-ba61-405b78f7b8f4/badges?type=1&size=xs)](https://www.gitcheese.com/app/#/projects/83cde58b-907d-4cd9-ba61-405b78f7b8f4/pledges/create) --->
 
 Semantic Versioning task for [boot-clj][1].
 

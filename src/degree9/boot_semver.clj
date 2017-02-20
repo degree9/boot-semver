@@ -3,7 +3,6 @@
             [boot.task.built-in :as task]
             [boot.util          :as util]
             [boot.git           :as git]
-            [boot.new           :as new]
             [clojure.java.io    :as io]
             [clj-semver.core    :as ver]
             [clj-time.core      :as timec]

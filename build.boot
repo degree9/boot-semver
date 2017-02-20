@@ -1,9 +1,8 @@
 (set-env!
- :dependencies  '[[org.clojure/clojure     "1.7.0"]
+ :dependencies  '[[org.clojure/clojure     "1.8.0"]
                   [adzerk/bootlaces        "0.1.13" :scope "test"]
                   [grimradical/clj-semver  "0.3.0"]
-                  [clj-time                "0.11.0"]
-                  [seancorfield/boot-new   "0.4.6"]]
+                  [clj-time                "0.13.0"]]
  :resource-paths   #{"src"})
 
 (require
@@ -23,8 +22,7 @@
   []
   (comp
    (watch)
-   (version :no-update true
-            :minor 'inc
+   (version :minor 'inc
             :patch 'zero
             :pre-release 'snapshot
             :generate 'degree9.boot-semver.version)

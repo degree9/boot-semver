@@ -2,7 +2,7 @@
   (:require [boot.core          :as boot]
             [boot.task.built-in :as task]
             [boot.util          :as util]
-            [adzerk.bootlaces   :as bootlaces]
+            [boot.git           :as git]
             [clojure.java.io    :as io]
             [clj-semver.core    :as ver]
             [clj-time.core      :as timec]

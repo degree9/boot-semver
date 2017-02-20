@@ -82,41 +82,69 @@
                                build (into ["+" build]))))
 
 (boot/deftask version
-  "Semantic Versioning for your project."
+  "Semantic Versioning for your project.
+
+  You can also :refer or :use the following helper symbols in your build.boot:
+
+  ;; Generic
+  'zero 'one 'two ... 'nine
+
+  ;; Pre-Release version helpers
+  'alpha 'beta 'snapshot
+
+  ;; Build version helpers
+  'semver-date          ;; \"yyyyMMdd\"
+  'semver-time          ;; \"hhmmss\"
+  'semver-date-time     ;; \"yyyyMMdd-hhmmss\"
+  'semver-date-dot-time ;; \"yyyyMMdd.hhmmss\"
+  'git-sha1-full        ;; full git commit string
+  'git-sha1             ;; short git commit string (7 chars)
+
+  And then use them at the command line:
+
+  boot version -r git-sha1
+  Version in version.properties ...: 0.1.3
+  Current Build Version ...: 0.1.3-1d7cfab"
   [x major       MAJ  sym  "Symbol of fn to apply to Major version."
    y minor       MIN  sym  "Symbol of fn to apply to Minor version."
    z patch       PAT  sym  "Symbol of fn to apply to Patch version."
    r pre-release PRE  sym  "Symbol of fn to apply to Pre-Release version."
    b build       BLD  sym  "Symbol of fn to apply to Build version."
-   n no-update        bool "Prevents writing to version.properties file."
+   d develop     bool      "Prevents writing to version.properties file."
    i include          bool "Includes version.properties file in out-files."
    g generate    GEN  sym  "Generate a namespace with version information."
    ]
-  (let [curver  (get-version semver-file)
-        cursemver (ver/version curver)
-        version-orig (to-mavver (update-version (ver/version curver) *opts*))
-        gen-ns (:generate *opts*)]
-        (boot/task-options! task/pom  #(assoc-in % [:version] version-orig)
-                            task/push #(assoc-in % [:ensure-version] version-orig))
-
-    (cond->
-      (boot/with-pre-wrap fs
+  (let [curver       (get-version semver-file)
+        version-orig (to-mavver (update-version (ver/version curver) *opts*))]
+    (boot/task-options! task/pom  #(assoc-in % [:version] version-orig)
+                        task/push #(assoc-in % [:ensure-version] version-orig))
+    (boot/with-pre-wrap fs
         ;; Rebuild Version incase it was modified by another task or by
         ;; functions passed to the task which rely on a runtime value
         ;; (pom and push will be out of sync)
-        (let [version (to-mavver (update-version (ver/version curver) *opts*))]
-          (when (not= version-orig version)
-            (util/warn (str "Version has been unexpectedly modified during task execution. \n")))
-          (util/info (clojure.string/join ["Version in version.properties ...: " curver "\n"]))
-          (util/info (clojure.string/join ["Current Build Version ...: " version "\n"]))
-          (when (and (nil? (:no-update *opts*)) (not= curver version))
-            (util/info (clojure.string/join ["Updating Project Version...: " curver "->" version "\n"]))
-            (set-version! semver-file version))
-          (if (:include *opts*)
-            (-> fs (boot/add-resource
-                    (-> semver-file io/file .getParent io/file)
-                    :include #{#"version.properties"})
-                  boot/commit!)
-            fs)))
-              ;; this (comp) is probably not needed if fileset is passed to another task
-      gen-ns (comp (new/new :generate [(str "semver=" gen-ns "/VERSION" )] :args [(str (get-version))])))))
+      (let [version (to-mavver (update-version (ver/version curver) *opts*))
+            include (:include *opts*)
+            gen-ns  (:generate *opts*)
+            develop (:develop *opts*)
+            tmp     (boot/tmp-dir!)
+            file    (str (clojure.string/join "/" (clojure.string/split (str gen-ns) #"\.")) ".clj")
+            ns-file (io/file tmp file)]
+        (when (not= version-orig version)
+          (util/dbug "Original Version ...: %s\n" version-orig)
+          (util/warn "Version has been unexpectedly modified during task pipeline. \n"))
+        (util/info "Version in version.properties ...: %s\n" curver)
+        (util/info "Current Build Version ...: %s\n" version)
+        (when (and (not (:develop *opts*)) (not= curver version))
+          (util/info "Updating Project Version...: %s -> %s\n" curver version)
+          (set-version! semver-file version))
+        (when gen-ns
+          (util/info "Generating Version Namespace...: %s\n" gen-ns)
+          (util/dbug "Generating Namespace File...: %s\n" ns-file)
+          (doto ns-file io/make-parents
+            (spit (str "(ns " gen-ns ")\n" "(def version \"" version "\")\n"))))
+        (cond-> fs
+          include (-> (boot/add-resource (-> semver-file io/file .getParent io/file)
+                        :include #{#"version.properties"})
+                      boot/commit!)
+          gen-ns  (-> (boot/add-resource tmp)
+                      boot/commit!))))))

@@ -22,7 +22,8 @@
   []
   (comp
    (watch)
-   (version :minor 'inc
+   (version :develop true
+            :minor 'inc
             :patch 'zero
             :pre-release 'snapshot
             :generate 'degree9.boot-semver.version)

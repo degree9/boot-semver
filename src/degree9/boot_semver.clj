@@ -132,7 +132,7 @@
             gen-ns  (:generate *opts*)
             develop (:develop *opts*)
             tmp     (boot/tmp-dir!)
-            file    (str (clojure.string/join "/" (clojure.string/split (str gen-ns) #"\.")) ".clj")
+            file    (str (clojure.string/join "/" (clojure.string/split (clojure.string/replace (str gen-ns) #"-" "_") #"\.")) ".clj")
             ns-file (io/file tmp file)]
         (when (not= version-orig version)
           (util/dbug "Original Version ...: %s\n" version-orig)

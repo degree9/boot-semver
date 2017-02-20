@@ -1,5 +1,6 @@
 (set-env!
- :dependencies  '[[adzerk/bootlaces        "0.1.13" :scope "test"]
+ :dependencies  '[[org.clojure/clojure     "1.7.0"]
+                  [adzerk/bootlaces        "0.1.13" :scope "test"]
                   [grimradical/clj-semver  "0.3.0"]
                   [clj-time                "0.11.0"]
                   [seancorfield/boot-new   "0.4.6"]]

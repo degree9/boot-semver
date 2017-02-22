@@ -59,11 +59,11 @@ y minor       MIN  sym  "Symbol of fn to apply to Minor version."
 z patch       PAT  sym  "Symbol of fn to apply to Patch version."
 r pre-release PRE  sym  "Symbol of fn to apply to Pre-Release version."
 b build       BLD  sym  "Symbol of fn to apply to Build version."
-n no-update        bool "Prevents writing to version.properties file."
+d develop          bool "Prevents writing to version.properties file."
 i include          bool "Includes version.properties file in out-files."
 ```
 
-The `:no-update` option is provided for development tasks. These tasks will modify the project version number however, this version number will not be written back to the filesystem.
+The `:develop` option is provided for development tasks. These tasks will modify the project version number however, this version number will not be written back to the filesystem.
 
 ```clojure
 (deftask dev
@@ -71,7 +71,7 @@ The `:no-update` option is provided for development tasks. These tasks will modi
   []
   (comp
    (watch)
-   (version :no-update true
+   (version :develop true
             :minor 'inc
             :pre-release 'snapshot)
    (build-jar)))

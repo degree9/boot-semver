@@ -147,9 +147,11 @@
           (util/dbug "Generating Namespace File...: %s\n" ns-file)
           (doto ns-file io/make-parents
             (spit (str "(ns " gen-ns ")\n" "(def version \"" version "\")\n"))))
+        (prn (-> semver-file io/file .getParent io/file .getAbsolutePath))
         (cond-> fs
           include (-> (boot/add-resource (-> semver-file io/file .getParent io/file)
-                        :include #{#"version.properties"})
+                        :include #{#"version.properties"}
+                        :exclude #{#"\.*\version.properties"})
                       boot/commit!)
           gen-ns  (-> (boot/add-resource tmp)
                       boot/commit!))))))

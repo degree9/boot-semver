@@ -61,6 +61,7 @@ r pre-release PRE  sym  "Symbol of fn to apply to Pre-Release version."
 b build       BLD  sym  "Symbol of fn to apply to Build version."
 d develop          bool "Prevents writing to version.properties file."
 i include          bool "Includes version.properties file in out-files."
+g generate    GEN  sym  "Generate a namespace with version information."
 ```
 
 The `:develop` option is provided for development tasks. These tasks will modify the project version number however, this version number will not be written back to the filesystem.
@@ -75,6 +76,41 @@ The `:develop` option is provided for development tasks. These tasks will modify
             :minor 'inc
             :pre-release 'snapshot)
    (build-jar)))
+```
+
+The `:include` option is provided for adding the `version.properties` file to the output directory.
+
+```clojure
+(deftask dev
+  "Build boot-semver for development."
+  []
+  (comp
+   (watch)
+   (version :develop true
+            :minor 'inc
+            :pre-release 'snapshot
+            :include true)
+   (build-jar)))
+```
+
+The `:generate` option is provided for building a namespace containing a single variable `version` which will contain the the current version, it takes the namespace to be generated as input.
+
+```clojure
+(deftask dev
+  "Build boot-semver for development."
+  []
+  (comp
+   (watch)
+   (version :develop true
+            :minor 'inc
+            :pre-release 'snapshot
+            :generate 'degree9.boot-semver.version)
+   (build-jar)))
+```
+```clojure
+(ns degree9.boot-semver.version)
+
+(def version "1.4.3")
 ```
 
 ##Helpers
@@ -95,8 +131,8 @@ A few helper functions are provided to be used with the version task.
 'semver-time          ;; "hhmmss"
 'semver-date-time     ;; "yyyyMMdd-hhmmss"
 'semver-date-dot-time ;; "yyyyMMdd.hhmmss"
-'semver-git           ;; full git commit string
-'semver-short-git     ;; short git commit string (7 chars)
+'git-sha1-full        ;; full git commit string
+'git-sha1             ;; short git commit string (7 chars)
 ```
 
 [1]: https://github.com/boot-clj/boot

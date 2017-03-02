@@ -11,6 +11,8 @@ Semantic Versioning task for [boot-clj][1].
 * Parses a `version.properties` file to read the current project version. Example content:
   `VERSION=0.1.1-SNAPSHOT`
 * Writes a new (if changed) [Maven compatible][2] version string to `version.properties`.
+* Optionally includes the `version.properties` file in target output.
+* Optionally generates a namespace containing version information.
 
 > The following outlines basic usage of the task, extensive testing has not been done.
 > Please submit issues and pull requests!

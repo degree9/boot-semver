@@ -64,7 +64,7 @@
 
 (defn get-version
   ([] (get-version semver-file))
-  ([file] (get-version semver-file "0.0.0"))
+  ([file] (get-version file "0.0.0"))
   ([file version] (if (.exists (io/as-file file))
                     (get (doto (java.util.Properties.)
                            (.load ^java.io.Reader (io/reader file)))

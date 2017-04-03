@@ -17,7 +17,7 @@ Semantic Versioning task for [boot-clj][1].
 > The following outlines basic usage of the task, extensive testing has not been done.
 > Please submit issues and pull requests!
 
-## Usage
+## Usage ##
 
 Add `boot-semver` to your `build.boot` dependencies and `require` the namespace:
 
@@ -50,7 +50,7 @@ Or use the `version` task in a deployment process:
    (push-release)))
 ```
 
-##Task Options
+## Task Options ##
 
 The `version` task exposes a bunch of options for modifying the project version during a build pipeline.
 Each option takes a quoted symbol (ex. `'inc`) which should resolve to an available function. This function will be applied to the current value of the project version component.
@@ -115,7 +115,7 @@ The `:generate` option is provided for building a namespace containing a single 
 (def version "1.4.3")
 ```
 
-##Helpers
+## Helpers ##
 
 A few helper functions are provided to be used with the version task.
 

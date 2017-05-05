@@ -174,6 +174,7 @@
   map from Boot envinronment. Additional repo-map option can be used to
   add options, like credentials, or to provide complete repo-map if Boot
   envinronment doesn't hold the named repository."
+
   [f file PATH            str      "The jar file to deploy."
    P pom PATH             str      "The pom.xml file to use (see install task)."
    F file-regex MATCH     #{regex} "The set of regexes of paths to deploy."
@@ -191,6 +192,7 @@
    S ensure-snapshot      bool     "Ensure that the current version is a snapshot."
    T ensure-tag TAG       str      "The SHA1 of the commit the pom's scm tag must contain."
    V ensure-version VER   str      "The version the jar's pom must contain."]
+
   (let [tgt (boot/tmp-dir!)]
     (boot/with-pass-thru [fs]
       (boot/empty-dir! tgt)
@@ -231,6 +233,9 @@
             (assert (or (= v @+version+) (= v ensure-version))
                     (format "jar version doesn't match project version (%s, %s)" v ensure-version))
             (util/info "Deploying %s...\n" (.getName f))
+            ;(pod/with-call-worker
+            ;  (boot.aether/deploy
+            ;    ~(boot/get-env) ~[repo repo-map] ~(.getPath f) ~pom ~artifact-map))
             (pod/with-call-in
               (pod/make-pod {:dependencies (boot/template [[boot/worker ~boot/*boot-version*]])})
               (boot.aether/deploy

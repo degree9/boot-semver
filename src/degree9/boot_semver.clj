@@ -1,14 +1,13 @@
 (ns degree9.boot-semver
   (:require [boot.core          :as boot]
+            [boot.git           :as git]
             [boot.task.built-in :as task]
             [boot.util          :as util]
-            [boot.git           :as git]
-            [clojure.java.io    :as io]
-            [clj-semver.core    :as ver]
             [clj-time.core      :as timec]
-            [clj-time.format    :as timef]))
+            [clj-time.format    :as timef]
+            [degree9.boot-semver.impl :as impl]))
 
-(def semver-file "./version.properties")
+;; Boot SemVer Utils ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn alpha [& _] "alpha")
 
@@ -42,49 +41,13 @@
 
 (defn semver-date-time [& [_ delim]] (clojure.string/join [(semver-date) (or delim ".") (semver-time)]))
 
-(defn- str->num [str]
-  (if (re-matches #"\d" str)
-    (bigdec str) str))
-
-(defn- update-version [vermap upmap]
-  (let [res #(-> % symbol resolve)]
-    (merge-with
-      (fn [uv vv]
-        (if (res uv)
-          ((res uv) (if (string? vv)
-                      (-> vv (clojure.string/replace #"[-+]" "") str->num)
-                      (or vv 0)))
-          (util/exit-error (util/fail "Unable to resolve symbol: %s \n" uv)))) upmap vermap)))
-
 (defn git-sha1-full [& _]
   (str (git/last-commit)))
 
 (defn git-sha1 [& _]
   (subs (git-sha1-full) 0 7))
 
-(defn get-version
-  ([] (get-version semver-file))
-  ([file] (get-version file "0.0.0"))
-  ([file version] (if (.exists (io/as-file file))
-                    (get (doto (java.util.Properties.)
-                           (.load ^java.io.Reader (io/reader file)))
-                         "VERSION"
-                         version)
-                    version)))
-
-(defn set-version! [file version]
-  (let [version (or version "0.1.0")]
-    (doto (java.util.Properties.)
-      (.setProperty "VERSION" version)
-      (.store ^java.io.Writer (io/writer file) nil))))
-
-(defn to-mavver [{:keys [major minor patch pre-release build]}]
-  (clojure.string/join (cond-> []
-                               major (into [major])
-                               minor (into ["." minor])
-                               patch (into ["." patch])
-                               pre-release (into ["-" pre-release])
-                               build (into ["+" build]))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (boot/deftask version
   "Semantic Versioning for your project.
@@ -115,41 +78,42 @@
    z patch       PAT  sym  "Symbol of fn to apply to Patch version."
    r pre-release PRE  sym  "Symbol of fn to apply to Pre-Release version."
    b build       BLD  sym  "Symbol of fn to apply to Build version."
-   d develop     bool      "Prevents writing to version.properties file."
+   d develop          bool "Prevents writing to version.properties file."
    i include          bool "Includes version.properties file in out-files."
    g generate    GEN  sym  "Generate a namespace with version information."
    ]
-  (let [curver       (get-version semver-file)
-        version-orig (to-mavver (update-version (ver/version curver) *opts*))]
-    (boot/task-options! task/pom  #(assoc-in % [:version] version-orig)
-                        task/push #(assoc-in % [:ensure-version] version-orig))
-    (boot/with-pre-wrap fs
-        ;; Rebuild Version incase it was modified by another task or by
-        ;; functions passed to the task which rely on a runtime value
-        ;; (pom and push will be out of sync)
-      (let [version (to-mavver (update-version (ver/version curver) *opts*))
-            include (:include *opts*)
-            gen-ns  (:generate *opts*)
-            develop (:develop *opts*)
-            tmp     (boot/tmp-dir!)
-            file    (str (clojure.string/join "/" (clojure.string/split (clojure.string/replace (str gen-ns) #"-" "_") #"\.")) ".clj")
-            ns-file (io/file tmp file)]
-        (when (not= version-orig version)
-          (util/dbug "Original Version ...: %s\n" version-orig)
-          (util/warn "Version has been unexpectedly modified during task pipeline. \n"))
-        (util/info "Version in version.properties ...: %s\n" curver)
-        (util/info "Current Build Version ...: %s\n" version)
-        (when (and (not (:develop *opts*)) (not= curver version))
-          (util/info "Updating Project Version...: %s -> %s\n" curver version)
-          (set-version! semver-file version))
-        (when gen-ns
-          (util/info "Generating Version Namespace...: %s\n" gen-ns)
-          (util/dbug "Generating Namespace File...: %s\n" ns-file)
-          (doto ns-file io/make-parents
-            (spit (str "(ns " gen-ns ")\n" "(def version \"" version "\")\n"))))
-        (cond-> fs
-          include (-> (boot/add-resource (-> semver-file io/file .getParent io/file)
-                        :include #{#"^version.properties$"})
-                      boot/commit!)
-          gen-ns  (-> (boot/add-resource tmp)
-                      boot/commit!))))))
+  (let [fver    (impl/get-version impl/semver-file)
+        include (:include *opts*)
+        gen-ns  (:generate *opts*)]
+    (util/info "Initial Project Version...: %s\n" fver)
+    (reset! impl/+version+ fver)
+    (cond-> (impl/version-impl fver *opts*)
+      include (impl/version-file)
+      gen-ns  (impl/version-ns :namespace gen-ns))))
+
+(boot/deftask build-jar
+  "Build and Install project jar with version information."
+  []
+  (comp (task/pom) (task/jar) (task/install)))
+
+(boot/deftask push-snapshot
+  "Deploy snapshot version to Clojars."
+  [f file PATH str "The jar file to deploy."]
+  (comp
+    (impl/version-clojars)
+    (task/push
+      :file            file
+      :ensure-snapshot true
+      :repo            "version-clojars")))
+
+(boot/deftask push-release
+  "Deploy release version to Clojars."
+  [f file PATH str "The jar file to deploy."]
+  (comp
+   (impl/version-clojars)
+   (task/push
+     :file           file
+     :tag            (boolean (git/last-commit))
+     :gpg-sign       true
+     :ensure-release true
+     :repo           "version-clojars")))

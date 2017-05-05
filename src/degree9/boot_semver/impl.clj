@@ -231,7 +231,8 @@
             (assert (or (= v @+version+) (= v ensure-version))
                     (format "jar version doesn't match project version (%s, %s)" v ensure-version))
             (util/info "Deploying %s...\n" (.getName f))
-            (pod/with-call-worker
+            (pod/with-call-in
+              (pod/make-pod {:dependencies (boot/template [[boot/worker ~boot/*boot-version*]])})
               (boot.aether/deploy
                 ~(boot/get-env) ~[repo repo-map] ~(.getPath f) ~pom ~artifact-map))
             (when tag

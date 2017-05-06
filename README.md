@@ -126,7 +126,6 @@ The latest version of `boot-semver` now supports continuous versioning and deplo
   (comp
    (watch)
    (version :develop true
-            :minor 'inc
             :pre-release 'snapshot
             :generate 'degree9.boot-semver.version)
    (build-jar)

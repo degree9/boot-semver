@@ -65,12 +65,9 @@
 
 ;; Boot SemVer Task Impl ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(boot/deftask version-ns
-  "Generate a namespace containing the project version."
-  [v version     VER  str  "Version string to be stored in namespace."
-   n namespace   GEN  sym  "Generate a namespace with version information. (app.version)"]
-  (let [version (:version *opts*)
-        gen-ns  (:namespace *opts* 'app.version)
+
+(defn version-ns-fn [version namespace]
+  (let [gen-ns  (or namespace 'app.version)
         tmp     (boot/tmp-dir!)]
     (util/info "Generating Version Namespace...: %s\n" gen-ns)
     (boot/with-pre-wrap fs
@@ -79,22 +76,33 @@
                            (clojure.string/split
                              (clojure.string/replace (str gen-ns) #"-" "_") #"\.")) ".clj")
             file    (io/file tmp path)
-            spit-ns #(spit (str "(ns " %1 ")\n" "(def version \"" %2 "\")\n"))]
+            spit-ns #(spit (str "(ns " %2 ")\n" "(def version \"" %3 "\")\n") %1)]
         (util/dbug "Generating Namespace File...: %s\n" file)
         (doto file io/make-parents (spit-ns gen-ns curver))
         (-> fs (boot/add-resource tmp) boot/commit!)))))
 
-(boot/deftask version-file
-  "Includes the version.properties file in the fileset."
-  []
+
+(boot/deftask version-ns
+  "Generate a namespace containing the project version."
+  [v version     VER  str  "Version string to be stored in namespace."
+   n namespace   GEN  sym  "Generate a namespace with version information. (app.version)"]
+  (version-ns-fn (:version *opts*) (:namespace *opts*)))
+
+
+(defn version-file-fn [& _]
   (let [projdir (-> semver-file io/file .getParent io/file)]
     (boot/with-pre-wrap fs
       (if (.exists (io/file projdir "version.properties"))
         (util/info "Adding version.properties to fileset... %s\n")
         (util/warn "Could not find version.properties... %s\n"))
       (-> fs
-        (boot/add-resource projdir :include #{#"^version.properties$"})
-        boot/commit!))))
+          (boot/add-resource projdir :include #{#"^version.properties$"})
+          boot/commit!))))
+
+(boot/deftask version-file
+  "Includes the version.properties file in the fileset."
+  []
+  (version-file-fn))
 
 (defn version-impl [fver opts]
   (boot/with-pass-thru _

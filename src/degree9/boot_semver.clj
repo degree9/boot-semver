@@ -88,8 +88,8 @@
     (util/info "Initial Project Version...: %s\n" fver)
     (reset! impl/+version+ fver)
     (cond-> (impl/version-impl fver *opts*)
-      include (impl/version-file)
-      gen-ns  (impl/version-ns :namespace gen-ns))))
+      include (impl/version-file-fn)
+      gen-ns  (impl/version-ns-fn gen-ns))))
 
 (boot/deftask build-jar
   "Build and Install project jar with version information."

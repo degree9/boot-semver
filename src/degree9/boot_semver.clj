@@ -88,8 +88,8 @@
     (util/info "Initial Project Version...: %s\n" fver)
     (reset! impl/+version+ fver)
     (cond-> (impl/version-impl fver *opts*)
-      include (impl/version-file)
-      gen-ns  (impl/version-ns :namespace gen-ns))))
+      include (comp (impl/version-file))
+      gen-ns  (comp (impl/version-ns :namespace gen-ns)))))
 
 (boot/deftask build-jar
   "Build and Install project jar with version information."
@@ -114,7 +114,7 @@
    (task/target)
    (task/push
      :file           file
-     :tag            (boolean (git/last-commit))
+     :tag            (boolean (util/guard (git/last-commit)))
      :ensure-release true
      :repo           "version-clojars")
      ))

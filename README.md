@@ -73,10 +73,10 @@ The `:develop` option is provided for development tasks. These tasks will modify
   "Build boot-semver for development."
   []
   (comp
-   (watch)
    (version :develop true
             :minor 'inc
             :pre-release 'snapshot)
+   (watch)
    (build-jar)))
 ```
 
@@ -87,11 +87,11 @@ The `:include` option is provided for adding the `version.properties` file to th
   "Build boot-semver for development."
   []
   (comp
-   (watch)
    (version :develop true
             :minor 'inc
             :pre-release 'snapshot
             :include true)
+   (watch)
    (build-jar)))
 ```
 
@@ -102,11 +102,11 @@ The `:generate` option is provided for building a namespace containing a single 
   "Build boot-semver for development."
   []
   (comp
-   (watch)
    (version :develop true
             :minor 'inc
             :pre-release 'snapshot
             :generate 'degree9.boot-semver.version)
+   (watch)
    (build-jar)))
 ```
 ```clojure
@@ -114,6 +114,24 @@ The `:generate` option is provided for building a namespace containing a single 
 
 (def version "1.4.3")
 ```
+
+## Continuous Deployment ##
+
+The latest version of `boot-semver` now supports continuous versioning and deployment. This allows you to place the `version` task after the `watch` task to support updating the project version each time the files are changed. Additionally `build-jar`, `push-snapshot` and `push-release` are provided which support the new `version` task.
+
+```clj
+(deftask dev
+  "Continuously build and deploy snapshot."
+  []
+  (comp
+   (watch)
+   (version :develop true
+            :pre-release 'snapshot
+            :generate 'degree9.boot-semver.version)
+   (build-jar)
+   (push-snapshot)))
+```
+
 
 ## Helpers ##
 

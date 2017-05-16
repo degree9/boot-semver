@@ -152,7 +152,7 @@
         clojars-creds (atom {})
         set-creds!    (partial swap! clojars-creds assoc)
         env-repos     (boot/get-env :repositories)
-        clojars-repo  (get (into {} env-repos) "clojars")]
+        clojars-repo  {:url "https://clojars.org/repo/"}]
     (set-creds! :username user :password pass)
     (boot/with-pass-thru _
       (when-not (and (:username @clojars-creds user) (:password @clojars-creds pass))
@@ -233,11 +233,7 @@
             (assert (or (= v @+version+) (= v ensure-version))
                     (format "jar version doesn't match project version (%s, %s)" v ensure-version))
             (util/info "Deploying %s...\n" (.getName f))
-            ;(pod/with-call-worker
-            ;  (boot.aether/deploy
-            ;    ~(boot/get-env) ~[repo repo-map] ~(.getPath f) ~pom ~artifact-map))
-            (pod/with-call-in
-              (pod/make-pod {:dependencies (boot/template [[boot/worker ~boot/*boot-version*]])})
+            (pod/with-call-worker
               (boot.aether/deploy
                 ~(boot/get-env) ~[repo repo-map] ~(.getPath f) ~pom ~artifact-map))
             (when tag

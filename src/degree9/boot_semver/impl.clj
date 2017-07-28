@@ -79,7 +79,7 @@
                            (clojure.string/split
                              (clojure.string/replace (str gen-ns) #"-" "_") #"\.")) ".clj")
             file    (io/file tmp path)
-            spit-ns #(spit (str "(ns " %1 ")\n" "(def version \"" %2 "\")\n"))]
+            spit-ns #(spit %1 (str "(ns " %2 ")\n" "(def version \"" %3 "\")\n"))]
         (util/dbug "Generating Namespace File...: %s\n" file)
         (doto file io/make-parents (spit-ns gen-ns curver))
         (-> fs (boot/add-resource tmp) boot/commit!)))))
@@ -90,8 +90,8 @@
   (let [projdir (-> semver-file io/file .getParent io/file)]
     (boot/with-pre-wrap fs
       (if (.exists (io/file projdir "version.properties"))
-        (util/info "Adding version.properties to fileset... %s\n")
-        (util/warn "Could not find version.properties... %s\n"))
+        (util/info "Adding version.properties to fileset...\n")
+        (util/warn "Could not find version.properties...\n"))
       (-> fs
         (boot/add-resource projdir :include #{#"^version.properties$"})
         boot/commit!))))

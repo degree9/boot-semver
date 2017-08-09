@@ -29,8 +29,6 @@
 
 (def semver-file "./version.properties")
 
-(def +version+ (atom nil))
-
 (defn get-version
   ([] (get-version semver-file))
   ([file] (get-version semver-file "0.0.0"))
@@ -59,7 +57,8 @@
   (-> ver ver/version (apply-version opts) to-mavver))
 
 (defn version= [ver]
-  (if (= @+version+ ver) ver @+version+))
+  (let [env (boot/get-env :version)]
+    (if (= env ver) ver env)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -74,12 +73,12 @@
         tmp     (boot/tmp-dir!)]
     (util/info "Generating Version Namespace...: %s\n" gen-ns)
     (boot/with-pre-wrap fs
-      (let [curver  (if version version @+version+)
+      (let [curver  (or version (boot/get-env :version))
             path    (str (clojure.string/join "/"
                            (clojure.string/split
                              (clojure.string/replace (str gen-ns) #"-" "_") #"\.")) ".clj")
             file    (io/file tmp path)
-            spit-ns #(spit (str "(ns " %1 ")\n" "(def version \"" %2 "\")\n"))]
+            spit-ns #(spit %1 (str "(ns " %2 ")\n" "(def version \"" %3 "\")\n"))]
         (util/dbug "Generating Namespace File...: %s\n" file)
         (doto file io/make-parents (spit-ns gen-ns curver))
         (-> fs (boot/add-resource tmp) boot/commit!)))))
@@ -90,8 +89,8 @@
   (let [projdir (-> semver-file io/file .getParent io/file)]
     (boot/with-pre-wrap fs
       (if (.exists (io/file projdir "version.properties"))
-        (util/info "Adding version.properties to fileset... %s\n")
-        (util/warn "Could not find version.properties... %s\n"))
+        (util/info "Adding version.properties to fileset...\n")
+        (util/warn "Could not find version.properties...\n"))
       (-> fs
         (boot/add-resource projdir :include #{#"^version.properties$"})
         boot/commit!))))
@@ -102,7 +101,7 @@
           curver  (version= fver)
           version (update-version curver opts)]
       (util/info "Current Build Version...: %s\n" version)
-      (reset! +version+ version)
+      (boot/set-env! :version version)
       (when (and (not develop) (not= fver version))
         (util/info "Updating Project Version...: %s -> %s\n" fver version)
         (set-version! semver-file version)))))
@@ -124,7 +123,7 @@
           tag       (:tag scm (util/guard (git/last-commit)))
           scm       (when scm (assoc scm :tag tag))
           deps      (:dependencies (boot/get-env) dependencies)
-          version   (:version *opts* @+version+)
+          version   (:version *opts* (boot/get-env :version))
           opts      (assoc *opts*
                         :version version
                         :scm scm
@@ -230,7 +229,7 @@
                     (format "scm tag in pom doesn't match (%s, %s)" t ensure-tag))
             (when (and ensure-tag (not t))
               (util/warn "The --ensure-tag option was specified but scm info is missing from pom.xml\n"))
-            (assert (or (= v @+version+) (= v ensure-version))
+            (assert (or (= v (boot/get-env :version)) (= v ensure-version))
                     (format "jar version doesn't match project version (%s, %s)" v ensure-version))
             (util/info "Deploying %s...\n" (.getName f))
             (pod/with-call-worker

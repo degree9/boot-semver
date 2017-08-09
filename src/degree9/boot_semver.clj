@@ -86,7 +86,7 @@
         include (:include *opts*)
         gen-ns  (:generate *opts*)]
     (util/info "Initial Project Version...: %s\n" fver)
-    (reset! impl/+version+ fver)
+    (boot/set-env! :version fver)
     (cond-> (impl/version-impl fver *opts*)
       include (comp (impl/version-file))
       gen-ns  (comp (impl/version-ns :namespace gen-ns)))))

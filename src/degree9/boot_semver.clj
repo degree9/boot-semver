@@ -80,8 +80,7 @@
    b build       BLD  sym  "Symbol of fn to apply to Build version."
    d develop          bool "Prevents writing to version.properties file."
    i include          bool "Includes version.properties file in out-files."
-   g generate    GEN  sym  "Generate a namespace with version information."
-   ]
+   g generate    GEN  sym  "Generate a namespace with version information."]
   (let [fver    (impl/get-version impl/semver-file)
         include (:include *opts*)
         gen-ns  (:generate *opts*)]
@@ -116,5 +115,4 @@
      :file           file
      :tag            (boolean (util/guard (git/last-commit)))
      :ensure-release true
-     :repo           "version-clojars")
-     ))
+     :repo           "version-clojars")))

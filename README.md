@@ -14,7 +14,7 @@ Semantic Versioning task for [boot-clj][1].
     <img width="135" src="http://degree9.io/images/degree9.png">
   </a>
   <br>
-  <b>D9 Enterprise is developed and maintained by Degree9</b>
+  <b>boot-semver is developed and maintained by Degree9</b>
 </p>
 
 ---

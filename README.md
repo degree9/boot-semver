@@ -7,6 +7,18 @@
 
 Semantic Versioning task for [boot-clj][1].
 
+---
+
+<p align="center">
+  <a href="https://degree9.io" align="center">
+    <img width="135" src="http://degree9.io/images/degree9.png">
+  </a>
+  <br>
+  <b>D9 Enterprise is developed and maintained by Degree9</b>
+</p>
+
+---
+
 * Provides `version` task
 * Parses a `version.properties` file to read the current project version. Example content:
   `VERSION=0.1.1-SNAPSHOT`

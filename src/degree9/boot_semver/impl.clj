@@ -1,12 +1,13 @@
 (ns degree9.boot-semver.impl
-  (:require [boot.core          :as boot]
-            [boot.git           :as git]
-            [boot.gpg           :as gpg]
-            [boot.pod           :as pod]
-            [boot.util          :as util]
-            [clojure.java.io    :as io]
-            [clj-semver.core    :as ver]
-            ))
+  (:require [boot.core       :as boot]
+            [boot.git        :as git]
+            [boot.gpg        :as gpg]
+            [boot.pod        :as pod]
+            [boot.util       :as util]
+            [boot.task.built-in :as task]
+            [clojure.java.io :as io]
+            [clj-semver.core :as ver]))
+
 ;; Boot SemVer Helpers ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn- str->num [str]
@@ -161,8 +162,8 @@
         (print "Password: ")
         (#(set-creds! :password %)
           (apply str (.readPassword (System/console))))
-        (boot/set-env! :repositories (conj env-repos ["version-clojars" (merge clojars-repo @clojars-creds)]))
-        ))))
+        (boot/set-env! :repositories (conj env-repos ["version-clojars" (merge clojars-repo @clojars-creds)]))))))
+
 
 (boot/deftask version-push
   "Deploy jar file to a Maven repository.

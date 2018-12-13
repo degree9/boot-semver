@@ -13,7 +13,7 @@ Semantic Versioning task for [boot-clj][1].
 
 <p align="center">
   <a href="https://degree9.io" align="center">
-    <img width="135" src="http://degree9.io/images/degree9.png">
+    <img width="135" src="/.github/logo.png">
   </a>
   <br>
   <b>boot-semver is developed and maintained by Degree9</b>

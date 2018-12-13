@@ -9,6 +9,18 @@
 
 Semantic Versioning task for [boot-clj][1].
 
+---
+
+<p align="center">
+  <a href="https://degree9.io" align="center">
+    <img width="135" src="http://degree9.io/images/degree9.png">
+  </a>
+  <br>
+  <b>boot-semver is developed and maintained by Degree9</b>
+</p>
+
+---
+
 * Provides `version` task
 * Parses a `version.properties` file to read the current project version. Example content:
   `VERSION=0.1.1-SNAPSHOT`
@@ -156,6 +168,18 @@ A few helper functions are provided to be used with the version task.
 'git-sha1-full        ;; full git commit string
 'git-sha1             ;; short git commit string (7 chars)
 ```
+
+---
+
+<p align="center">
+  <a href="https://www.patreon.com/degree9" align="center">
+    <img src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png" width="160" alt="Patreon">
+  </a>
+  <br>
+  <b>Support this and other open-source projects on Patreon!</b>
+</p>
+
+---
 
 [1]: https://github.com/boot-clj/boot
 [2]: https://docs.oracle.com/middleware/1212/core/MAVEN/maven_version.htm

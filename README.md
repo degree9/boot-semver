@@ -1,7 +1,9 @@
-# boot-semver
+<p align="center"><img src="/.github/d9boot-semver.png" width="445px"></p>
+
 [![Clojars Project](https://img.shields.io/clojars/v/degree9/boot-semver.svg)](https://clojars.org/degree9/boot-semver)
 [![Dependencies Status](https://jarkeeper.com/degree9/boot-semver/status.svg)](https://jarkeeper.com/degree9/boot-semver)
 [![Downloads](https://jarkeeper.com/degree9/boot-semver/downloads.svg)](https://jarkeeper.com/degree9/boot-semver)
+[![Slack][slack]][d9-slack]
 <!--- [![CircleCI](https://circleci.com/gh/degree9/boot-semver.svg?style=svg)](https://circleci.com/gh/degree9/boot-semver)
 [![gitcheese.com](https://api.gitcheese.com/v1/projects/83cde58b-907d-4cd9-ba61-405b78f7b8f4/badges?type=1&size=xs)](https://www.gitcheese.com/app/#/projects/83cde58b-907d-4cd9-ba61-405b78f7b8f4/pledges/create) --->
 
@@ -157,3 +159,5 @@ A few helper functions are provided to be used with the version task.
 
 [1]: https://github.com/boot-clj/boot
 [2]: https://docs.oracle.com/middleware/1212/core/MAVEN/maven_version.htm
+[slack]: https://img.shields.io/badge/clojurians-degree9-%23e01563.svg?logo=slack
+[d9-slack]: https://clojurians.slack.com/channels/degree9/

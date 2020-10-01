@@ -77,7 +77,7 @@
       (let [curver  (or version (boot/get-env :version))
             path    (str (clojure.string/join "/"
                            (clojure.string/split
-                             (clojure.string/replace (str gen-ns) #"-" "_") #"\.")) ".clj")
+                             (clojure.string/replace (str gen-ns) #"-" "_") #"\.")) ".cljc")
             file    (io/file tmp path)
             spit-ns #(spit %1 (str "(ns " %2 ")\n" "(def version \"" %3 "\")\n"))]
         (util/dbug "Generating Namespace File...: %s\n" file)

@@ -1,5 +1,6 @@
 (set-env!
- :dependencies  '[[grimradical/clj-semver  "0.3.0"]
+ :dependencies  '[[org.clojure/clojure     "1.10.1"]
+                  [grimradical/clj-semver  "0.3.0"]
                   [clj-time                "0.15.1"]]
  :resource-paths   #{"src"})
 

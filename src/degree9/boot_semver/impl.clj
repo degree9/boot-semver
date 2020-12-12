@@ -161,8 +161,8 @@
         (#(set-creds! :username %) (read-line))
         (print "Password: ")
         (#(set-creds! :password %)
-          (apply str (.readPassword (System/console))))
-        (boot/set-env! :repositories (conj env-repos ["version-clojars" (merge clojars-repo @clojars-creds)]))))))
+          (apply str (.readPassword (System/console)))))
+      (boot/set-env! :repositories (conj env-repos ["version-clojars" (merge clojars-repo @clojars-creds)])))))
 
 
 (boot/deftask version-push

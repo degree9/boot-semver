@@ -110,7 +110,6 @@
   [f file PATH str "The jar file to deploy."]
   (comp
    (impl/version-clojars)
-   (task/target)
    (task/push
      :file           file
      :tag            (boolean (util/guard (git/last-commit)))
